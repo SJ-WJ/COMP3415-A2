@@ -13,7 +13,8 @@ class SafetyNetTests(unittest.TestCase):
   def setUp(self):
     directory = tempfile.TemporaryDirectory()
     self.addCleanup(directory.cleanup)
-    self.service = OrderService(Path(directory.name) / "state.json")
+    self.path = Path(directory.name) / "state.json"
+    self.service = OrderService(self.path)
 
   def stock(self, product_id):
     return next(p["stock"] for p in self.service.catalog()
@@ -33,6 +34,23 @@ class SafetyNetTests(unittest.TestCase):
     quote = self.service.quote("student", [item("bag", 2)])
     self.assertEqual(quote["discount_cents"], 500)
 
+  # Invalid or exceptional behaviour
+  def test_rejected_order_changes_nothing(self):
+    self.service.place_order("regular", [item("mug", 1)])
+    before = self.path.read_bytes()
+    with self.assertRaises(ValueError):
+        self.service.place_order("regular", [item("mug", 1), item("laptop", 1)])
+    self.assertEqual(self.path.read_bytes(), before)
+    self.assertEqual(self.stock("mug"), 7)
+
+# Behaviour to preserve
+  def test_quote_matches_placed_order(self):
+    request = ("student", [item("hoodie", 2)], "delivery")
+    quote = self.service.quote(*request)
+    order = self.service.place_order(*request)
+    self.assertEqual(quote["total_cents"], 7800)
+    self.assertEqual(order["total_cents"], quote["total_cents"])
+    self.assertEqual(order["items"], quote["items"])
   
 if __name__ == "__main__":
   unittest.main()
