@@ -1,0 +1,27 @@
+test_cli_express_example (test_express.ExpressTests) ... ok
+test_cr01_examples (test_express.ExpressTests) ... ok
+test_express_fee_is_never_free (test_express.ExpressTests) ... ok
+test_express_quote_matches_placed_order (test_express.ExpressTests) ... ok
+test_other_fulfillment_values_still_rejected (test_express.ExpressTests) ... ok
+test_every_menu_option (test_menu.MenuTests) ... ok
+test_place_order_deducts_stock_and_numbers_orders (test_safety_net.SafetyNetTests) ... ok
+test_quote_matches_placed_order (test_safety_net.SafetyNetTests) ... ok
+test_rejected_order_changes_nothing (test_safety_net.SafetyNetTests) ... ok
+test_student_discount_at_exactly_5000 (test_safety_net.SafetyNetTests) ... FAIL
+test_cancel_order_restores_stock (test_smoke.OrderSmokeTests) ... ok
+test_order_can_be_reopened (test_smoke.OrderSmokeTests) ... ok
+test_regular_pickup_quote (test_smoke.OrderSmokeTests) ... ok
+test_student_delivery_quote (test_smoke.OrderSmokeTests) ... ok
+
+======================================================================
+FAIL: test_student_discount_at_exactly_5000 (test_safety_net.SafetyNetTests)
+----------------------------------------------------------------------
+Traceback (most recent call last):
+  File "tests/test_safety_net.py", line 35, in test_student_discount_at_exactly_5000
+    self.assertEqual(quote["discount_cents"], 500)
+AssertionError: 0 != 500
+
+----------------------------------------------------------------------
+Ran 14 tests in 0.007s
+
+FAILED (failures=1)
