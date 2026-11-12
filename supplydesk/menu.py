@@ -42,48 +42,66 @@ def read_request(service):
     return customer, items, fulfillment
 
 
+def view_products(service):
+    show_catalog(service.catalog())
+
+def get_quote(service):
+    request = read_request(service)
+    show_order(service. quote(*request))
+    print("Quote only: no stock reserved and no order created.")
+
+def place_new_order(service):
+    request = read_request(service)
+    show_order(service.quote(*request))
+    if input("Place this order? [y/N]: ").strip().lower() == "y":
+        show_order(service.place_order(*request))
+    else:
+        print("Order not placed.")
+
+def view_history(service):
+    orders = service.list_orders()
+    if not orders:
+        print("No orders yet.")
+    for order in orders:
+        show_order(order)
+
+def find_order(service):
+    order_id = input("Order ID: ").strip()
+    show_order(service.get_order(order_id))
+
+def cancel_existing_order(service):
+    order_id = input("Order ID to cancel: ").strip()
+    if input("Cancel this order? [y/N]: ").strip().lower() == "y":
+        show_order(service.cancel_order(order_id))
+    else:
+        print("Cancellation abandoned.")
+
+MENU_OPTIONS = {
+    "1": view_products,
+    "2": get_quote,
+    "3": place_new_order,
+    "4": view_history,
+    "5": find_order,
+    "6": cancel_existing_order,
+}
+
 def run_menu(service):
-    print("Campus Supply Desk | All prices are CAD. Orders are saved automatically.")
-    while True:
-        try:
-            print("\n1. View products and stock\n2. Get a quote\n3. Place an order"
-                  "\n4. View order history\n5. Find an order\n6. Cancel an order\n0. Exit")
-            choice = input("Choose an option: ").strip()
-            if choice == "0":
-                print("Goodbye.")
-                return 0
-            if choice == "1":
-                show_catalog(service.catalog())
-            elif choice in ("2", "3"):
-                request = read_request(service)
-                if choice == "2":
-                    show_order(service.quote(*request))
-                    print("Quote only: no stock reserved and no order created.")
-                else:
-                    show_order(service.quote(*request))
-                    if input("Place this order? [y/N]: ").strip().lower() == "y":
-                        show_order(service.place_order(*request))
-                    else:
-                        print("Order not placed.")
-            elif choice == "4":
-                orders = service.list_orders()
-                if not orders:
-                    print("No orders yet.")
-                for order in orders:
-                    show_order(order)
-            elif choice == "5":
-                show_order(service.get_order(input("Order ID: ").strip()))
-            elif choice == "6":
-                order_id = input("Order ID to cancel: ").strip()
-                if input("Cancel this order? [y/N]: ").strip().lower() == "y":
-                    show_order(service.cancel_order(order_id))
-                else:
-                    print("Cancellation abandoned.")
-            else:
-                print("Choose a number from 0 to 6.")
-        except (EOFError, KeyboardInterrupt):
-            print("\nGoodbye.")
-            return 0
-        except (ValueError, OSError, KeyError, TypeError) as error:
-            print(f"Error: {error}")
-            print("Returning to the menu. Check your input or state file before retrying.")
+  print("Campus Supply Desk | All prices are CAD. Orders are saved automatically.")
+  while True:
+      try:
+        print("\n1. View products and stock\n2. Get a quote\n3. Place an order"
+              "\n4. View order history\n5. Find an order\n6. Cancel an order\n0. Exit")
+        choice = input("Choose an option: ").strip()
+        if choice == "0":
+          print("Goodbye.")
+          return 0
+        if choice in MENU_OPTIONS:
+          MENU_OPTIONS[choice](service)
+        else:
+            print("Choose a number from 0 to 6.")
+      except (EOFError, KeyboardInterrupt):
+        print("\nGoodbye.")
+        return 0
+      except (ValueError, OSError, KeyError, TypeError) as error:
+        print(f"Error: {error}")
+        print("Returning to the menu. Check your input or state file before retrying.")
