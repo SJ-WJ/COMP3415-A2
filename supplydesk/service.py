@@ -9,6 +9,9 @@ STUDENT_DISCOUNT_PERCENT = 10
 FREE_DELIVERY_MIN_TOTAL = 10000
 DELIVERY_FEE = 600
 
+EXPRESS_FEE = 1200
+FULFILLMENT_OPTIONS = ("pickup", "delivery", "express")
+
 class OrderService:
     def __init__(self, state_path=".supplydesk/state.json"):
         self.store = JsonStore(state_path)
@@ -44,7 +47,7 @@ class OrderService:
              
         if customer_type not in ("regular", "student"):
             raise ValueError("Customer type must be regular or student.")
-        if fulfillment not in ("pickup", "delivery"):
+        if fulfillment not in FULFILLMENT_OPTIONS:
             raise ValueError("Fulfillment must be pickup or delivery.")
         if not isinstance(items, list) or not items:
             raise ValueError("An order must contain at least one item.")
@@ -78,7 +81,9 @@ class OrderService:
         if customer_type == "student" and subtotal > MIN_STUDENT_DISCOUNT_TOTAL:
             discount = (subtotal * STUDENT_DISCOUNT_PERCENT + 50) // 100
         delivery = 0
-        if fulfillment == "delivery" and subtotal - discount < FREE_DELIVERY_MIN_TOTAL:
+        if fulfillment == "express":
+            delivery = EXPRESS_FEE
+        elif fulfillment == "delivery" and subtotal - discount < FREE_DELIVERY_MIN_TOTAL:
             delivery = DELIVERY_FEE
         return {
             "customer_type": customer_type,
