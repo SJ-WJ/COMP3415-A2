@@ -57,7 +57,7 @@ place_order(customer_type, items, fulfillment="pickup")
 Both operations require:
 
 - Customer type: exactly `regular` or `student`.
-- Fulfillment: exactly `pickup` or `delivery`.
+- Fulfillment: exactly `pickup` or `delivery` or `express`.
 - Items: a nonempty list of dictionaries, each containing `product_id` and `quantity`.
 - A valid product ID for every item.
 - An integer quantity from 1 through 99 inclusive for each item. Booleans, fractional numbers, and numeric strings are not valid quantities when calling the service directly.
@@ -88,6 +88,7 @@ All service calculations and stored monetary values use integer Canadian cents.
 4. Pickup is free.
 5. Delivery costs 600 cents ($6.00). Delivery is free when the subtotal minus the discount is at least 10,000 cents ($100.00).
 6. Total = subtotal minus discount plus delivery charge. No taxes or other charges apply.
+7. Express costs 1,200 cents ($12.00) and is never free
 
 Examples—all amounts below are in cents:
 
